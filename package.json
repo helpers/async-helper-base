@@ -1,6 +1,6 @@
 {
   "name": "async-helper-base",
-  "description": "Base for easily creating async helpers for verb, assemble, or any other application built on template.js.",
+  "description": "Used for creating template.js-compatible async helpers. Works with verb, assemble or any other template.js application.",
   "version": "0.1.0",
   "homepage": "https://github.com/jonschlinkert/async-helper-base",
   "author": {

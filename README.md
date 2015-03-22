@@ -1,6 +1,6 @@
 # async-helper-base [![NPM version](https://badge.fury.io/js/async-helper-base.svg)](http://badge.fury.io/js/async-helper-base)
 
-> Base for easily creating async helpers for verb, assemble, or any other application built on template.js.
+> Used for creating template.js-compatible async helpers. Works with verb, assemble or any other template.js application.
 
 ## Install with [npm](npmjs.org)
 
