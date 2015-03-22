@@ -1,0 +1,42 @@
+{
+  "name": "async-helper-base",
+  "description": "Base for easily creating async helpers for verb, assemble, or any other application built on template.js.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/jonschlinkert/async-helper-base",
+  "author": {
+    "name": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jonschlinkert/async-helper-base.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jonschlinkert/async-helper-base/issues"
+  },
+  "license": {
+    "type": "MIT",
+    "url": "https://github.com/jonschlinkert/async-helper-base/blob/master/LICENSE"
+  },
+  "files": [
+    "index.js"
+  ],
+  "main": "index.js",
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "dependencies": {
+    "chalk": "^1.0.0",
+    "lodash": "^3.5.0"
+  },
+  "devDependencies": {
+    "engine-lodash": "^0.5.0",
+    "mocha": "*",
+    "should": "*",
+    "template": "^0.12.5"
+  },
+  "keywords": []
+}
