@@ -15,16 +15,17 @@ var _ = require('lodash');
  * Module dependencies
  */
 
-module.exports = function asyncHelperBase(app) {
+module.exports = function asyncHelperBase(app, pattern) {
   if (typeof app !== 'object' || !app.hasOwnProperty('_')) {
     throw new TypeError('async-helper-base: invalid `app` argument.');
   }
 
-  return function (name, opts) {
+  return function (name, options) {
     if (typeof name !== 'string') {
       throw new TypeError('async-helper-base expects `name` to be a string.');
     }
 
+    options = options || {};
     return function (key, locals, next) {
       var last = arguments[arguments.length - 1];
       if (typeof locals === 'function') {
@@ -35,7 +36,7 @@ module.exports = function asyncHelperBase(app) {
         next = last;
       }
 
-      opts = _.extend({}, opts, locals);
+      var opts = _.extend({}, options, locals);
 
       // get the matching (plural) collection name
       var collection = app.collection[name];
@@ -44,11 +45,10 @@ module.exports = function asyncHelperBase(app) {
       // or glob patterns defined by the helper
       if (opts && opts.cwd) {
         // define the pattern as an array so it's definitely globbed by the loader
-        app[collection]([path.join(opts.cwd, key + '{,.md}')]);
+        app[collection]([path.join(opts.cwd, key + (pattern || '{,.md,.hbs}'))]);
       }
 
       var template = app.lookup(collection, key), dot;
-
       if (!template && (dot = key.indexOf('.')) !== -1) {
         template = app.lookup(collection, key.slice(0, dot));
       }
