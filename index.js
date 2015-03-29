@@ -15,59 +15,56 @@ var _ = require('lodash');
  * Module dependencies
  */
 
-module.exports = function asyncHelperBase(app, pattern) {
-  if (typeof app !== 'object' || !app.hasOwnProperty('_')) {
-    throw new TypeError('async-helper-base: invalid `app` argument.');
+module.exports = function asyncHelperBase(name, options) {
+  if (typeof name !== 'string') {
+    throw new TypeError('async-helper-base expects `name` to be a string.');
   }
 
-  return function (name, options) {
-    if (typeof name !== 'string') {
-      throw new TypeError('async-helper-base expects `name` to be a string.');
+  options = options || {};
+  return function (key, locals, next) {
+    var last = arguments[arguments.length - 1];
+    if (typeof locals === 'function') {
+      next = locals; locals = {};
     }
 
-    options = options || {};
-    return function (key, locals, next) {
-      var last = arguments[arguments.length - 1];
-      if (typeof locals === 'function') {
-        next = locals; locals = {};
+    if (typeof next !== 'function') {
+      next = last;
+    }
+
+    var opts = _.extend({}, this.options, options, locals);
+    var app = this.app;
+    var map = app.inflections || app.collection;
+
+    // get the matching (plural) collection name
+    var collection = map[name];
+
+    // if a `cwd` is define in a helper, load the templates(s)
+    // or glob patterns defined by the helper
+    if (opts && opts.cwd) {
+      // define the pattern as an array so it's definitely globbed by the loader
+      app[collection]([path.join(opts.cwd, key + (opts.pattern || '{,.md,.hbs}'))]);
+    }
+
+    var template = app.lookup(collection, key), dot;
+    if (!template && (dot = key.indexOf('.')) !== -1) {
+      template = app.lookup(collection, key.slice(0, dot));
+    }
+
+    var ctx = _.merge({}, this.context, opts);
+
+    // call the template's render method
+    template.render(ctx, function render(err, content) {
+      if (err) {
+        error(name, key, err);
+        return next(err);
       }
-
-      if (typeof next !== 'function') {
-        next = last;
-      }
-
-      var opts = _.extend({}, options, locals);
-
-      // get the matching (plural) collection name
-      var collection = app.collection[name];
-
-      // if a `cwd` is define in a helper, load the templates(s)
-      // or glob patterns defined by the helper
-      if (opts && opts.cwd) {
-        // define the pattern as an array so it's definitely globbed by the loader
-        app[collection]([path.join(opts.cwd, key + (pattern || '{,.md,.hbs}'))]);
-      }
-
-      var template = app.lookup(collection, key), dot;
-      if (!template && (dot = key.indexOf('.')) !== -1) {
-        template = app.lookup(collection, key.slice(0, dot));
-      }
-
-      var ctx = _.merge({}, this.context, opts);
-
-      // call the template's render method
-      template.render(ctx, function render(err, content) {
-        if (err) {
-          error(name, err);
-          return next(err);
-        }
-        next(null, content);
-      });
-    };
+      next(null, content);
+    });
   };
 };
 
-function error(name, err) {
-  var msg = chalk.red('{%= ' + name + ' %} error: %j', err);
+
+function error(name, key, err) {
+  var msg = chalk.red('async-helper-base: {%= ' + name + '("' + key + '") %} error: %j', err);
   return console.error(msg);
 }
