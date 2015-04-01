@@ -45,7 +45,26 @@ describe('helper', function () {
       template.asyncHelper('badge', helper('badge'));
       template.render('<%= badge("travis") %>', {name: 'verb'}, function (err, res) {
         if (err) console.log(err);
-        // res.should.equal('[![Build Status](http://img.shields.io/travis/verb.svg)](https://travis-ci.org/verb)');
+        res.should.equal('[![Build Status](http://img.shields.io/travis/verb.svg)](https://travis-ci.org/verb)');
+        done();
+      });
+    });
+
+    it('should use globally defined options in the helper:', function (done) {
+      template.option('helper', {
+        badge: {cwd: 'fixtures'}
+      });
+
+      // create a custom template type
+      template.create('badge');
+
+      // override the auto-generated `badge` helper with a custom helper
+      template.asyncHelper('badge', helper('badge'));
+
+      // call the badge helper
+      template.render('<%= badge("aaa") %>', {name: 'verb'}, function (err, res) {
+        if (err) console.log(err);
+        res.should.equal('Fixtures!!! [![Build Status](http://img.shields.io/travis/verb.svg)](https://travis-ci.org/verb)');
         done();
       });
     });
