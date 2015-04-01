@@ -1,0 +1,1 @@
+Fixtures!!! [![Build Status](http://img.shields.io/travis/<%= name %>.svg)](https://travis-ci.org/<%= name %>)
