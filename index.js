@@ -31,21 +31,26 @@ module.exports = function asyncHelperBase(name, options) {
       next = last;
     }
 
-    var opts = _.extend({}, this.options, options, locals);
+    var opts = _.extend({}, this.options.helper && this.options.helper[name], options, locals);
     var app = this.app;
     var map = app.inflections || app.collection;
 
     // get the matching (plural) collection name
     var collection = map[name];
 
-    // if a `cwd` is define in a helper, load the templates(s)
-    // or glob patterns defined by the helper
+    // if a `cwd` is defined the actual helper, load the templates(s) from
+    // the glob patterns defined by the helper
     if (opts && opts.cwd) {
+      if (opts.nodefaults) app.views[collection] = {};
+
       // define the pattern as an array so it's definitely globbed by the loader
-      app[collection]([path.join(opts.cwd, key + (opts.pattern || '{,.md,.hbs}'))]);
+      var glob = path.resolve(opts.cwd, key + (opts.extPattern || '{.md,.hbs}'));
+      app[collection](glob);
     }
 
-    var template = app.lookup(collection, key), dot;
+    var template = app.lookup(collection, key);
+    var dot;
+
     if (!template && (dot = key.indexOf('.')) !== -1) {
       template = app.lookup(collection, key.slice(0, dot));
     }
@@ -62,7 +67,6 @@ module.exports = function asyncHelperBase(name, options) {
     });
   };
 };
-
 
 function error(name, key, err) {
   var msg = chalk.red('async-helper-base: {%= ' + name + '("' + key + '") %} error: %j', err);
