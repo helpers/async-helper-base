@@ -68,5 +68,20 @@ describe('helper', function () {
         done();
       });
     });
+
+    it('should take a callback to modify the rendered string:', function (done) {
+      template.create('badge');
+      template.badge('travis', {content: '[![Build Status](http://img.shields.io/travis/<%= name %>.svg)](https://travis-ci.org/<%= name %>)'});
+
+      template.asyncHelper('badge', helper('badge', function (str, name) {
+        return str.split('verb').join(name);
+      }));
+
+      template.render('<%= badge("travis", "foo") %>', {name: 'verb'}, function (err, res) {
+        if (err) console.log(err);
+        res.should.equal('[![Build Status](http://img.shields.io/travis/foo.svg)](https://travis-ci.org/foo)');
+        done();
+      });
+    });
   });
 });
