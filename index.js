@@ -41,11 +41,11 @@ module.exports = function asyncHelperBase(name, options) {
     // if a `cwd` is defined the actual helper, load the templates(s) from
     // the glob patterns defined by the helper
     if (opts && opts.cwd) {
-      if (opts.nodefaults) app.views[collection] = {};
+      if (opts.cwd === '.') opts.cwd = process.cwd();
 
       // define the pattern as an array so it's definitely globbed by the loader
-      var glob = path.resolve(opts.cwd, key + (opts.extPattern || '{.md,.hbs}'));
-      app[collection](glob);
+      var fp = path.resolve(opts.cwd, key + (opts.extPattern || '{.md,.hbs}'));
+      app[collection](fp);
     }
 
     var template = app.lookup(collection, key);
